@@ -7,9 +7,11 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "Launch",
       "program": "${workspaceFolder}/dist/app.js",
-      "preLaunchTask": "tsc: build - tsconfig.json",
+      "preLaunchTask": "npm: build",
+      "console": "integratedTerminal",
+      "sourceMaps": true,
       "outFiles": [
         "${workspaceFolder}/dist/**/*.js"
       ]

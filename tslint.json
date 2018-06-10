@@ -1,9 +1,22 @@
 {
-    "defaultSeverity": "error",
-    "extends": [
-        "tslint:recommended"
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint:recommended"
+  ],
+  "rules": {
+    "linebreak-style": [true, "LF"],
+    "interface-name": [true, "never-prefix"],
+    "ordered-imports": [
+      true,
+      {
+        "import-sources-order": "any",
+        "named-imports-order": "lowercase-first"
+      }
     ],
-    "rules": {
-        "linebreak-style": [true, "LF"]
-    }
+    "one-line": [
+      true,
+      "check-open-brace",
+      "check-whitespace"
+    ]
+  }
 }
