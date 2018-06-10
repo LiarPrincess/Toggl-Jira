@@ -1,0 +1,12 @@
+{
+  "search.exclude": {
+      "**/node_modules": true,
+      "**/bower_components": true,
+      "**/dist": true,
+      "**/coverge": true
+  },
+  "tslint.exclude": "**/node_modules/**/*",
+  "cSpell.words": [
+    "toggl", "jira"
+  ],
+}

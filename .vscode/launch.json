@@ -9,7 +9,6 @@
       "request": "launch",
       "name": "Launch",
       "program": "${workspaceFolder}/dist/app.js",
-      "preLaunchTask": "npm: build",
       "console": "integratedTerminal",
       "sourceMaps": true,
       "outFiles": [
