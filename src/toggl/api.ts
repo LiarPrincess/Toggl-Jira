@@ -1,7 +1,7 @@
-import { Moment, duration, utc } from "moment";
+import { Moment, duration, utc as date, ISO_8601 } from "moment";
 import { get, post, put } from "request-promise-native";
 import { User } from "./../users";
-import TogglEntry from "./togglEntry";
+import { TogglEntry } from ".";
 
 type TogglEntries = ReadonlyArray<TogglEntry>;
 
@@ -55,12 +55,12 @@ function createRequest(user: User, endpoint: string): any {
 }
 
 function parseEntry(entry: any): TogglEntry {
-  const toSeconds = 1000;
+  const toMilliseconds = 1000;
   return {
     id: entry.id,
     description: entry.description,
-    date: utc(entry.at),
-    duration: duration(entry.duration * toSeconds),
+    date: date(entry.start, ISO_8601).utcOffset(2), // assuming DST
+    duration: duration(entry.duration * toMilliseconds),
   };
 }
 

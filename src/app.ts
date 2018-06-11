@@ -1,6 +1,9 @@
-import moment from "moment";
+import { utc as date, duration } from "moment";
+import { join } from "path";
 import logger from "./util/logger";
 import * as toggl from "./toggl";
+
+import "moment-duration-format";
 import "./util/configuration";
 
 (async () => {
@@ -11,47 +14,55 @@ import "./util/configuration";
       jiraPassword: "string",
     };
 
-    const startDate = moment("01-05-2018 01:00", "DD-MM-YYYY HH:mm");
-    const endDate   = moment("30-05-2018 23:59", "DD-MM-YYYY HH:mm");
+    const startDate = date("01-05-2018 01:00", "DD-MM-YYYY HH:mm");
+    const endDate   = date("30-05-2018 23:59", "DD-MM-YYYY HH:mm");
+
+    const exportPath = join(process.cwd(), "private", "input.csv");
+    const exportEntries = await toggl.parseExportFile(exportPath);
+
+    for (const entry of exportEntries) {
+      logger.info(pretty(entry));
+    }
 
     // const newEntry = await toggl.startTimeEntry(user, "Test task");
     // logger.info(`${newEntry}`);
 
-    const currentEntry = await toggl.getCurrentTimeEntry(user);
-    if (currentEntry) {
-      const duration = currentEntry.duration;
-      const hours = duration.hours();
-      const min = duration.minutes();
-      const sec = duration.seconds();
-      logger.info(`${hours}:${min}:${sec}`);
-      logger.info(`Current entry: ${currentEntry.date} | ${currentEntry.duration} | ${currentEntry.description}`);
-    }
-    else logger.info("No current entry.");
+    // const currentEntry = await toggl.getCurrentTimeEntry(user);
+    // if (currentEntry) {
+    //   logger.info(`Current entry: ${pretty(currentEntry)}`);
+    // }
+    // else logger.info("No current entry.");
 
-    if (currentEntry) {
-      const stoppedCurrentEntry = await toggl.stopTimeEntry(user, currentEntry);
-
-      if (stoppedCurrentEntry) {
-        const duration = stoppedCurrentEntry.duration;
-        const hours = duration.hours();
-        const min = duration.minutes();
-        const sec = duration.seconds();
-        logger.info(`${hours}:${min}:${sec}`);
-        logger.info(`Current entry: ${stoppedCurrentEntry.date} | ${stoppedCurrentEntry.duration} | ${stoppedCurrentEntry.description}`);
-      }
-    }
-    else {
-      logger.info("No entry to stop.");
-    }
+    // if (currentEntry) {
+    //   const stoppedEntry = await toggl.stopTimeEntry(user, currentEntry);
+    //   if (stoppedEntry) {
+    //     logger.info(`Current entry: ${pretty(stoppedEntry)}`);
+    //   }
+    // }
+    // else { logger.info("No entry to stop."); }
 
     // const entries = await toggl.getTimeEntries(user, startDate, endDate);
     // for (const entry of entries) {
-    //   const description = entry.description.length > 57 ? `${entry.description.substring(0, 57)}...` : entry.description;
-    //   logger.info(`${entry.id} | ${entry.date} | ${entry.duration} | ${description}`);
+    //   logger.info(pretty(entry));
     // }
+
+    logger.info("Finished.");
   }
   catch (e) {
     logger.error(e.stack);
     process.exitCode = 1;
   }
 })();
+
+function pretty(entry: toggl.TogglEntry): string {
+  const id = entry.id;
+  const date = entry.date.format();
+  const duration = entry.duration.format("hh:mm:ss");
+
+  const maxDescriptionLength = 60;
+  const description = entry.description.length > maxDescriptionLength ?
+    entry.description.substr(0, maxDescriptionLength - 3) + "..." :
+    entry.description;
+
+  return `${id} | ${date} | ${duration} | ${description}`;
+}
