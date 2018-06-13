@@ -55,11 +55,10 @@ function createRequest(user: User, endpoint: string): any {
 }
 
 function parseEntry(entry: any): TogglEntry {
-  const toMilliseconds = 1000;
   return {
     id: entry.id,
     description: entry.description,
     date: date(entry.start, ISO_8601).utcOffset(2), // assuming DST
-    duration: duration(entry.duration * toMilliseconds),
+    duration: duration(entry.duration, "seconds"),
   };
 }
