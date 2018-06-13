@@ -18,12 +18,10 @@
 
     /* Module Resolution Options */
     "moduleResolution": "node",
-    "baseUrl": "./",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "baseUrl": ".",
   },
   "include": [
-      "src/**/*"
+      "src/**/*.ts"
   ],
   "exclude": [
       "node_modules",

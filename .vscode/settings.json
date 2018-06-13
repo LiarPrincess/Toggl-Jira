@@ -7,6 +7,9 @@
   },
   "tslint.exclude": "**/node_modules/**/*",
   "cSpell.words": [
-    "toggl", "jira"
+    "toggl",
+    "jira",
+    "worklog",
+    "worklogs"
   ],
 }
