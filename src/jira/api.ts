@@ -9,7 +9,7 @@ export function getWorkLog(user: User, ticket: string): Promise<WorkEntry[]> {
   const client = createClient(user);
   return client.issue.getWorkLogs({ issueKey: ticket })
     .then(json => json.worklogs)
-    .then(entries => entries.map(parseWorkEntry))
+    .then(entries => entries.map(e => parseWorkEntry(ticket, e)))
     .catch((err) => { throw new Error(`Unable to get worklog for ${ticket}: ${parseErrorMessage(err)}.`); });
 }
 
@@ -20,10 +20,10 @@ export function addWorkLog(user: User, ticket: string, date: Moment, duration: D
     adjustEstimate: "auto",
     worklog: {
       started: date.format("YYYY-MM-DD[T12:00:00.00-0000]"),
-      timeSpent: duration.format("hh[h] mm[m]"),
+      timeSpent: duration.format("HH[h] mm[m]"),
     },
   })
-  .then(parseWorkEntry)
+  .then(e => parseWorkEntry(ticket, e))
   .catch((err) => { throw new Error(`Unable to add worklog to ${ticket}: ${parseErrorMessage(err)}.`); });
 }
 
@@ -39,11 +39,11 @@ function createClient(user: User): JiraClient {
   });
 }
 
-function parseWorkEntry(entry: any): any {
+function parseWorkEntry(ticket: string, entry: any): WorkEntry {
   return {
-    id: entry["id"],
+    ticket,
     date: date(entry["started"], ISO_8601),
-    duration: duration(2, entry["timeSpentSeconds"]),
+    duration: duration(entry["timeSpentSeconds"], "seconds"),
     comment: entry["comment"],
   };
 }

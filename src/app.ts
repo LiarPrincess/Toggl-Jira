@@ -1,4 +1,4 @@
-import { utc as date, duration, Moment } from "moment";
+import { utc as date, duration } from "moment";
 import { join } from "path";
 import logger from "./util/logger";
 import * as toggl from "./toggl";
@@ -16,8 +16,10 @@ import "./util/configuration";
       jiraPassword: process.env.JIRA_PASSWORD as string,
     };
 
-    const startDate = date("01-05-2018 01:00", "DD-MM-YYYY HH:mm");
-    const endDate   = date("30-05-2018 23:59", "DD-MM-YYYY HH:mm");
+    const exportPath = join(process.cwd(), "private", "input.csv");
+    const exportEntries = await toggl.parseExportFile(exportPath);
+
+    const result = await jira.sync(user, exportEntries);
 
     logger.info("Finished.");
   }
@@ -27,29 +29,15 @@ import "./util/configuration";
   }
 })();
 
-async function testJiraApi(user: User) {
-  const worklog = await jira.getWorkLog(user, "FRINT-7425");
+async function testTogglApi(user: User) {
+  const startDate = date("01-05-2018 01:00", "DD-MM-YYYY HH:mm");
+  const endDate   = date("30-05-2018 23:59", "DD-MM-YYYY HH:mm");
 
-  const jiraDate = date("13-06-2018 01:00", "DD-MM-YYYY HH:mm");
-  const jiraDuration = duration(10, "minutes");
-  const newEntry = await jira.addWorkLog(user, "FRINT-7425", jiraDate, jiraDuration);
-}
-
-async function testTogglApi(user: User, startDate: Moment, endDate: Moment) {
   const exportPath = join(process.cwd(), "private", "input.csv");
   const exportEntries = await toggl.parseExportFile(exportPath);
 
   for (const entry of exportEntries) {
     logger.info(prettyTogglEntry(entry));
-  }
-
-  const mappingResult = jira.map(exportEntries);
-
-  for (const jiraEntry of mappingResult.entries) {
-    logger.info(`${prettyJiraEntry(jiraEntry)}`);
-    for (const togglEntry of jiraEntry.entries) {
-      logger.info(`  ${prettyTogglEntry(togglEntry)}`);
-    }
   }
 
   const newEntry = await toggl.startTimeEntry(user, "Test task");
@@ -83,8 +71,8 @@ function prettyJiraEntry(entry: jira.JiraEntry): string {
 
 function prettyTogglEntry(entry: toggl.TogglEntry): string {
   const id = entry.id;
-  const date = entry.date.format("YYYY-MM-DD hh:mm:ss Z");
-  const duration = entry.duration.format("hh[h] mm[m] ss[s]");
+  const date = entry.date.format("YYYY-MM-DD HH:mm:ss Z");
+  const duration = entry.duration.format("HH[h] mm[m] ss[s]");
 
   const maxDescriptionLength = 60;
   const description = entry.description.length > maxDescriptionLength ?

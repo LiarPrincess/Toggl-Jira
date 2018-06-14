@@ -1,16 +1,16 @@
-import { TogglEntry } from "../toggl";
-import { JiraEntry } from ".";
 import { Moment } from "moment";
+import { JiraEntry } from ".";
+import { TogglEntry } from "../toggl";
 
 interface MappingResult {
   readonly entries: JiraEntry[];
-  readonly invalidEntries: TogglEntry[];
+  readonly unmappedEntries: TogglEntry[];
 }
 
-export function map(togglEntries: ReadonlyArray<TogglEntry>): MappingResult {
+export default function map(togglEntries: ReadonlyArray<TogglEntry>): MappingResult {
   const ticketRegex = new RegExp(`(${process.env.JIRA_TICKET_REGEX})`);
 
-  const result: MappingResult = { entries: [], invalidEntries: [] };
+  const result: MappingResult = { entries: [], unmappedEntries: [] };
   for (const togglEntry of togglEntries) {
     const ticketMatches = togglEntry.description.match(ticketRegex);
 
@@ -19,29 +19,24 @@ export function map(togglEntries: ReadonlyArray<TogglEntry>): MappingResult {
       const jiraEntry = result.entries.find(e => hasEqualTicketAndDay(e, ticket, togglEntry.date));
 
       if (jiraEntry) {
-        jiraEntry.entries.push(togglEntry);
+        jiraEntry.togglEntries.push(togglEntry);
       }
       else {
         result.entries.push({
           ticket,
-          date: togglEntry.date.startOf("day"),
-          entries: [togglEntry],
+          date: togglEntry.date.startOf("day").add(12, "hours"),
+          togglEntries: [togglEntry],
         });
       }
     }
-    else result.invalidEntries.push(togglEntry);
+    else result.unmappedEntries.push(togglEntry);
   }
 
   return result;
 }
 
-const comparer = new Intl.Collator("en", {
-  usage: "search",
-  sensitivity: "base",
-});
-
 function hasEqualTicketAndDay(entry: JiraEntry, ticket: string, date: Moment): boolean {
-  const hasEqualTicket = comparer.compare(entry.ticket, ticket) === 0;
+  const hasEqualTicket = entry.ticket === ticket;
   const hasEqualDay = entry.date.isSame(date, "day");
   return hasEqualTicket && hasEqualDay;
 }
