@@ -17,6 +17,7 @@
     "jira-connector": "^2.8.0",
     "moment": "^2.22.2",
     "moment-duration-format": "^2.2.2",
+    "moment-timezone": "^0.5.17",
     "request": "^2.87.0",
     "request-promise-native": "^1.0.5",
     "winston": "^2.4.2"
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@types/dotenv": "^4.0.3",
     "@types/moment-duration-format": "^2.2.0",
+    "@types/moment-timezone": "^0.5.6",
     "@types/node": "^10.3.0",
     "@types/request": "^2.47.0",
     "@types/request-promise-native": "^1.0.14",

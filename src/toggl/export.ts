@@ -1,11 +1,10 @@
+import { duration, default as moment, ISO_8601 } from "moment-timezone";
+import { default as csv } from "csv-parse";
 import { createReadStream } from "fs";
-import { default as parse } from "csv-parse";
-import { duration, utc as date, ISO_8601 } from "moment";
 import { TogglEntry } from ".";
+import { User } from "../users";
 
-type TogglEntries = ReadonlyArray<TogglEntry>;
-
-export function parseExportFile(path: string): Promise<TogglEntries> {
+export function parseExport(user: User, path: string): Promise<TogglEntry[]> {
   return new Promise((resolve, reject) => {
     const options = { columns: true, delimiter: "," };
 
@@ -15,19 +14,21 @@ export function parseExportFile(path: string): Promise<TogglEntries> {
 
     const stream = createReadStream(path);
     stream.on("error", rejectWithError);
-    stream.pipe(parse(options, (err, data) => {
+    stream.pipe(csv(options, (err, data) => {
       if (err) rejectWithError(err);
-      else resolve(data.map(parseEntry));
+      else resolve(data.map((e: any) => parseEntry(user, e)));
     }));
   });
 }
 
-function parseEntry(entry: any): TogglEntry {
-  const startDateString = `${entry["Start date"]}T${entry["Start time"]}`;
+function parseEntry(user: User, entry: any): TogglEntry {
+  const timezone = user.timezone;
+  const dateString = `${entry["Start date"]}T${entry["Start time"]}`;
+
   return {
     id: 0,
     description: entry["Description"],
-    date: date(startDateString, ISO_8601).utcOffset(2).subtract(2, "hours"), // assuming DST
+    date: moment.tz(dateString, ISO_8601, timezone),
     duration: duration(entry["Duration"]),
   };
 }

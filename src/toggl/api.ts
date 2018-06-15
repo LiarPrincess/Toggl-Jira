@@ -1,11 +1,9 @@
-import { Moment, duration, utc as date, ISO_8601 } from "moment";
+import { Moment, duration, utc, ISO_8601 } from "moment";
 import { get, post, put } from "request-promise-native";
-import { User } from "./../users";
+import { User } from "src/users";
 import { TogglEntry } from ".";
 
-type TogglEntries = ReadonlyArray<TogglEntry>;
-
-export function startTimeEntry(user: User, description: string): Promise<TogglEntry> {
+export function startEntry(user: User, description: string): Promise<TogglEntry> {
   const request = createRequest(user, "time_entries/start");
   request.body = {
     "time_entry": { "description": description, "created_with": "api" }
@@ -13,24 +11,24 @@ export function startTimeEntry(user: User, description: string): Promise<TogglEn
 
   return post(request)
     .then((json) => parseEntry(json.data))
-    .catch((err) => { throw new Error(`Unable to start new Toggl entry ${description}: ${err.message}.`); });
+    .catch((err) => throwError(`Unable to start new Toggl entry ${description}: ${err.message}.`));
 }
 
-export function stopTimeEntry(user: User, entry: TogglEntry): Promise<TogglEntry> {
+export function stopEntry(user: User, entry: TogglEntry): Promise<TogglEntry> {
   const request = createRequest(user, `time_entries/${entry.id}/stop`);
   return put(request)
     .then((json) => parseEntry(json.data))
-    .catch((err) => { throw new Error(`Unable to stop Toggl entry '${entry.description}': ${err.message}.`); });
+    .catch((err) => throwError(`Unable to stop Toggl entry '${entry.description}': ${err.message}.`));
 }
 
-export function getCurrentTimeEntry(user: User): Promise<TogglEntry | undefined> {
+export function getCurrentEntry(user: User): Promise<TogglEntry | undefined> {
   const request = createRequest(user, "time_entries/current");
   return get(request)
     .then((json) => json.data ? parseEntry(json.data) : undefined)
-    .catch((err) => { throw new Error(`Unable to get current Toggl entry: ${err.message}.`); });
+    .catch((err) => throwError(`Unable to get current Toggl entry: ${err.message}.`));
 }
 
-export function getTimeEntries(user: User, startDate: Moment, endDate: Moment): Promise<TogglEntries> {
+export function getEntries(user: User, startDate: Moment, endDate: Moment): Promise<TogglEntry[]> {
   const request = createRequest(user, "time_entries");
   request.qs = {
     start_date: startDate.toISOString(),
@@ -39,7 +37,7 @@ export function getTimeEntries(user: User, startDate: Moment, endDate: Moment): 
 
   return get(request)
     .then((json) => json.map(parseEntry))
-    .catch((err) => { throw new Error(`Unable to get Toggl entries: ${err.message}.`); });
+    .catch((err) => throwError(`Unable to get Toggl entries: ${err.message}.`));
 }
 
 function createRequest(user: User, endpoint: string): any {
@@ -58,7 +56,11 @@ function parseEntry(entry: any): TogglEntry {
   return {
     id: entry.id,
     description: entry.description,
-    date: date(entry.start, ISO_8601).utcOffset(2), // assuming DST
+    date: utc(entry.start, ISO_8601),
     duration: duration(entry.duration, "seconds"),
   };
+}
+
+function throwError(message: string): never {
+  throw new Error(message);
 }
