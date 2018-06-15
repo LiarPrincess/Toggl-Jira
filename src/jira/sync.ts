@@ -1,9 +1,9 @@
-import { User } from "../users";
-import { TogglEntry } from "../toggl";
-import { default as map } from "./mapper";
-import { addWorkLog, getWorkLog } from "./api";
-import JiraEntry from "./models/jiraEntry";
 import { Moment, Duration, duration } from "moment";
+import { addWorkLog, getWorkLog } from "./api";
+import { User } from "src/users";
+import { TogglEntry } from "src/toggl";
+import { default as map } from "./mapper";
+import JiraEntry from "./models/jiraEntry";
 import WorkEntry from "./models/workEntry";
 
 interface Result {
@@ -88,32 +88,4 @@ function sumDurations(entries: TogglEntry[]): Duration {
   return entries
         .map(e => e.duration)
         .reduce((acc, d) => acc.add(d), duration(0));
-}
-
-// -------------------------------
-
-function prettyWorkEntry(entry: WorkEntry): string {
-  const ticket = entry.ticket;
-  const date = entry.date.format("YYYY-MM-DD HH:mm:ss Z");
-  const duration = entry.duration.format("HH[h] mm[m] ss[s]");
-  return `${date} ${ticket} ${duration}`;
-}
-
-function prettyJiraEntry(entry: JiraEntry): string {
-  const ticket = entry.ticket;
-  const date = entry.date.format("YYYY-MM-DD");
-  return `${date} ${ticket}`;
-}
-
-function prettyTogglEntry(entry: TogglEntry): string {
-  const id = entry.id;
-  const date = entry.date.format("YYYY-MM-DD HH:mm:ss Z");
-  const duration = entry.duration.format("HH[h] mm[m] ss[s]");
-
-  const maxDescriptionLength = 60;
-  const description = entry.description.length > maxDescriptionLength ?
-    entry.description.substr(0, maxDescriptionLength - 3) + "..." :
-    entry.description;
-
-  return `${id} | ${date} | ${duration} | ${description}`;
 }
