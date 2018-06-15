@@ -1,22 +1,14 @@
-import { Moment, Duration, duration } from "moment";
+import { Moment, Duration, duration } from "moment-timezone";
 import { addWorkLog, getWorkLog } from "./api";
 import { User } from "src/users";
 import { TogglEntry } from "src/toggl";
 import { default as map } from "./mapper";
-import JiraEntry from "./models/jiraEntry";
-import WorkEntry from "./models/workEntry";
+import { JiraEntry, WorkEntry, SyncResult } from ".";
 
-interface Result {
-  entries: JiraEntry[];
-  unmappedEntries: TogglEntry[];
-  alreadySyncedEntries: JiraEntry[];
-  failedEntries: { entry: JiraEntry; error: Error; }[];
-}
-
-export async function sync(user: User, togglEntries: ReadonlyArray<TogglEntry>): Promise<Result> {
+export async function sync(user: User, togglEntries: TogglEntry[]): Promise<SyncResult> {
   const { entries, unmappedEntries } = map(togglEntries);
 
-  const result: Result = {
+  const result: SyncResult = {
     entries: [],
     unmappedEntries,
     alreadySyncedEntries: [],
@@ -39,21 +31,21 @@ export async function sync(user: User, togglEntries: ReadonlyArray<TogglEntry>):
   return Promise.resolve(result);
 }
 
-type SyncResult = "SyncSuccessful" | "AlreadySynced" | Error;
+type Result = "SyncSuccessful" | "AlreadySynced" | Error;
 
-async function syncEntry(user: User, jiraEntry: JiraEntry, existingEntries: WorkEntry[]): Promise<SyncResult> {
-  const ticket = jiraEntry.ticket;
-  const date = jiraEntry.date;
-  const duration = sumDurations(jiraEntry.togglEntries);
-
-  const exitingEntry = existingEntries.find(w => hasEqualTicketAndDay(w, ticket, date));
+async function syncEntry(user: User, jiraEntry: JiraEntry, existingEntries: WorkEntry[]): Promise<Result> {
+  const exitingEntry = existingEntries.find(w => hasEqualTicketAndDay(user, w, jiraEntry));
   if (exitingEntry) {
-    return Promise.resolve("AlreadySynced" as SyncResult);
+    return Promise.resolve("AlreadySynced" as Result);
   }
 
   try {
+    const ticket = jiraEntry.ticket;
+    const date = localDate(user, jiraEntry.date);
+    const duration = sumDurations(jiraEntry.togglEntries);
+
     // addWorkLog(user, ticket, date, duration);
-    return Promise.resolve("SyncSuccessful" as SyncResult);
+    return Promise.resolve("SyncSuccessful" as Result);
   }
   catch (e) {
     return Promise.resolve(e as Error);
@@ -78,9 +70,13 @@ function append(lhs: WorkEntry[], rhs: WorkEntry[]): WorkEntry[] {
   return lhs.concat(rhs);
 }
 
-function hasEqualTicketAndDay(entry: WorkEntry, ticket: string, date: Moment): boolean {
-  const hasEqualTicket = entry.ticket === ticket;
-  const hasEqualDay = entry.date.isSame(date, "day");
+function hasEqualTicketAndDay(user: User, workEntry: WorkEntry, jiraEntry: JiraEntry): boolean {
+  const ticket = jiraEntry.ticket;
+  const jiraDate = localDate(user, jiraEntry.date);
+  const workDate = localDate(user, workEntry.date);
+
+  const hasEqualTicket = workEntry.ticket === ticket;
+  const hasEqualDay = workDate.isSame(jiraDate, "day");
   return hasEqualTicket && hasEqualDay;
 }
 
@@ -89,3 +85,8 @@ function sumDurations(entries: TogglEntry[]): Duration {
         .map(e => e.duration)
         .reduce((acc, d) => acc.add(d), duration(0));
 }
+
+function localDate(user: User, date: Moment): Moment {
+  return date.clone().tz(user.timezone);
+}
+

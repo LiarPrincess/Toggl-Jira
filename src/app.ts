@@ -19,9 +19,7 @@ import "./util/configuration";
     const exportPath = join(process.cwd(), "private", "input.csv");
     const exportEntries = await toggl.parseExport(user, exportPath);
 
-    for (const entry of exportEntries) {
-      logger.info(prettyTogglEntry(entry));
-    }
+    const syncResult = await jira.sync(user, exportEntries);
 
     logger.info("Finished.");
   }
