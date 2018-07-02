@@ -1,5 +1,5 @@
+import User from "src/user";
 import { JiraEntry } from ".";
-import { User } from "src/users";
 import { TogglEntry } from "src/toggl";
 import { equalTicketAndDay } from "./time-zone";
 

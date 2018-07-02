@@ -1,8 +1,7 @@
-import { join } from "path";
 import { tz as date } from "moment-timezone";
 
 import logger from "./util/logger";
-import { User } from "./users";
+import User from "./user";
 import * as pretty from "./util/pretty-print";
 import * as toggl from "./toggl";
 import * as jira from "./jira";

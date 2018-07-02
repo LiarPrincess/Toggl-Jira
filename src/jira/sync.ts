@@ -1,11 +1,9 @@
-import { Duration, duration } from "moment-timezone";
-
-import { addWorkLog, getWorkLog } from "./api";
-import { User } from "src/users";
+import User from "src/user";
 import { TogglEntry } from "src/toggl";
 import { default as map } from "./mapper";
+import { addWorkLog, getWorkLog } from "./api";
 import { JiraEntry, WorkEntry, SyncResult } from ".";
-import { equalTicketAndDay, toUserTimeZone } from "./time-zone";
+import { equalTicketAndDay, inUserTimeZone } from "./time-zone";
 
 export async function sync(user: User, togglEntries: TogglEntry[]): Promise<SyncResult> {
   const { entries, unmappedEntries } = map(user, togglEntries);
@@ -43,7 +41,7 @@ async function syncEntry(user: User, jiraEntry: JiraEntry, existingEntries: Work
 
   try {
     const ticket = jiraEntry.ticket;
-    const date = toUserTimeZone(user, jiraEntry.date);
+    const date = inUserTimeZone(user, jiraEntry.date);
     const duration = jiraEntry.duration;
 
     const workLog = await addWorkLog(user, ticket, date, duration);

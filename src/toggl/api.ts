@@ -1,7 +1,7 @@
 import { Moment, duration, utc, ISO_8601 } from "moment";
 import { get, post, put } from "request-promise-native";
 
-import { User } from "src/users";
+import User from "src/user";
 import { TogglEntry } from ".";
 
 export function startEntry(user: User, description: string): Promise<TogglEntry> {

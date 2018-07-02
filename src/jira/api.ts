@@ -1,7 +1,8 @@
 import { Moment, Duration, utc as date, duration, ISO_8601 } from "moment";
 import { default as JiraClient } from "jira-connector";
-import { User } from "./../users";
-import { default as WorkEntry } from "./models/workEntry";
+
+import User from "src/user";
+import { WorkEntry } from ".";
 
 import "moment-duration-format";
 
