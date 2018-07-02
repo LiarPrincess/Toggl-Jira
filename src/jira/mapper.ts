@@ -20,12 +20,14 @@ export default function map(user: User, togglEntries: TogglEntry[]): MappingResu
       const jiraEntry = result.entries.find(e => equalTicketAndDay(user, e, { ticket, ...togglEntry }));
 
       if (jiraEntry) {
+        jiraEntry.duration.add(togglEntry.duration);
         jiraEntry.togglEntries.push(togglEntry);
       }
       else {
         result.entries.push({
           ticket,
-          date: togglEntry.date.startOf("day").add(12, "hours"),
+          date: togglEntry.date.clone().startOf("day").add(12, "hours"),
+          duration: togglEntry.duration.clone(),
           togglEntries: [togglEntry],
         });
       }

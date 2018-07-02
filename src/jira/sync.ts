@@ -1,4 +1,5 @@
 import { Duration, duration } from "moment-timezone";
+
 import { addWorkLog, getWorkLog } from "./api";
 import { User } from "src/users";
 import { TogglEntry } from "src/toggl";
@@ -19,20 +20,20 @@ export async function sync(user: User, togglEntries: TogglEntry[]): Promise<Sync
   const existingWorklogs = await getWorklogs(user, entries);
   for (const entry of entries) {
     const entryResult = await syncEntry(user, entry, existingWorklogs);
-    if (entryResult == "Success") {
-      result.entries.push(entry);
-    }
-    else if (entryResult == "Duplicate") {
+    if (entryResult == "Duplicate") {
       result.duplicateEntries.push(entry);
     }
-    else {
+    else if (entryResult instanceof Error) {
       result.failedEntries.push( { ...entry, error: entryResult });
+    }
+    else {
+      result.entries.push(entry);
     }
   }
   return Promise.resolve(result);
 }
 
-type SyncEntryResult = "Success" | "Duplicate" | Error;
+type SyncEntryResult = WorkEntry | "Duplicate" | Error;
 
 async function syncEntry(user: User, jiraEntry: JiraEntry, existingEntries: WorkEntry[]): Promise<SyncEntryResult> {
   const exitingEntry = existingEntries.find(w => equalTicketAndDay(user, w, jiraEntry));
@@ -43,10 +44,10 @@ async function syncEntry(user: User, jiraEntry: JiraEntry, existingEntries: Work
   try {
     const ticket = jiraEntry.ticket;
     const date = toUserTimeZone(user, jiraEntry.date);
-    const duration = sumDurations(jiraEntry.togglEntries);
+    const duration = jiraEntry.duration;
 
-    // addWorkLog(user, ticket, date, duration);
-    return Promise.resolve("Success" as SyncEntryResult);
+    const workLog = await addWorkLog(user, ticket, date, duration);
+    return Promise.resolve(workLog);
   }
   catch (e) {
     return Promise.resolve(e as Error);
@@ -69,10 +70,4 @@ function isUnique(s: string, index: number, arr: string[]): boolean {
 
 function append(lhs: WorkEntry[], rhs: WorkEntry[]): WorkEntry[] {
   return lhs.concat(rhs);
-}
-
-function sumDurations(entries: TogglEntry[]): Duration {
-  return entries
-        .map(e => e.duration)
-        .reduce((acc, d) => acc.add(d), duration(0));
 }

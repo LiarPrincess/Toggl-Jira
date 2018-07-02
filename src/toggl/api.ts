@@ -1,5 +1,6 @@
 import { Moment, duration, utc, ISO_8601 } from "moment";
 import { get, post, put } from "request-promise-native";
+
 import { User } from "src/users";
 import { TogglEntry } from ".";
 
