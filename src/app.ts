@@ -1,8 +1,9 @@
 import { join } from "path";
-import { logger, prettyTogglEntry, prettyJiraEntry } from "./util";
 import * as toggl from "./toggl";
 import * as jira from "./jira";
+import logger from "./util/logger";
 import { User } from "./users";
+import { prettyTogglEntry, prettyJiraEntry, prettyWorkEntry } from "./util/pretty-print";
 
 import "moment-duration-format";
 import "./util/configuration";
@@ -19,7 +20,11 @@ import "./util/configuration";
     const exportPath = join(process.cwd(), "private", "input.csv");
     const exportEntries = await toggl.parseExport(user, exportPath);
 
-    const syncResult = await jira.sync(user, exportEntries);
+    for (const entry of exportEntries) {
+      logger.info("Toggl entry: ", prettyTogglEntry(entry));
+    }
+
+    // const syncResult = await jira.sync(user, exportEntries);
 
     logger.info("Finished.");
   }
