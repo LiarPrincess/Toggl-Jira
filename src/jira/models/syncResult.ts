@@ -1,9 +1,9 @@
-import { JiraEntry } from "src/jira";
 import { TogglEntry } from "src/toggl";
+import { JiraEntry, FailedEntry } from "src/jira";
 
 export default interface SyncResult {
   entries: JiraEntry[];
   unmappedEntries: TogglEntry[];
-  alreadySyncedEntries: JiraEntry[];
-  failedEntries: { entry: JiraEntry; error: Error; }[];
+  duplicateEntries: JiraEntry[];
+  failedEntries: FailedEntry[];
 }

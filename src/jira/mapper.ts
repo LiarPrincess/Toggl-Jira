@@ -1,13 +1,14 @@
-import { Moment } from "moment";
 import { JiraEntry } from ".";
-import { TogglEntry } from "../toggl";
+import { User } from "src/users";
+import { TogglEntry } from "src/toggl";
+import { equalTicketAndDay } from "./time-zone";
 
 interface MappingResult {
   readonly entries: JiraEntry[];
   readonly unmappedEntries: TogglEntry[];
 }
 
-export default function map(togglEntries: ReadonlyArray<TogglEntry>): MappingResult {
+export default function map(user: User, togglEntries: TogglEntry[]): MappingResult {
   const ticketRegex = new RegExp(`(${process.env.JIRA_TICKET_REGEX})`);
 
   const result: MappingResult = { entries: [], unmappedEntries: [] };
@@ -16,7 +17,7 @@ export default function map(togglEntries: ReadonlyArray<TogglEntry>): MappingRes
 
     if (ticketMatches) {
       const ticket = ticketMatches[0];
-      const jiraEntry = result.entries.find(e => hasEqualTicketAndDay(e, ticket, togglEntry.date));
+      const jiraEntry = result.entries.find(e => equalTicketAndDay(user, e, { ticket, ...togglEntry }));
 
       if (jiraEntry) {
         jiraEntry.togglEntries.push(togglEntry);
@@ -33,10 +34,4 @@ export default function map(togglEntries: ReadonlyArray<TogglEntry>): MappingRes
   }
 
   return result;
-}
-
-function hasEqualTicketAndDay(entry: JiraEntry, ticket: string, date: Moment): boolean {
-  const hasEqualTicket = entry.ticket === ticket;
-  const hasEqualDay = entry.date.isSame(date, "day");
-  return hasEqualTicket && hasEqualDay;
 }

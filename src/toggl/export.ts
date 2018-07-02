@@ -12,12 +12,12 @@ export function parseExport(user: User, path: string): Promise<TogglEntry[]> {
       reject(new Error(`Unable to parse Toggl export '${path}': ${err.message}.`));
     };
 
-    const stream = createReadStream(path);
-    stream.on("error", rejectWithError);
-    stream.pipe(csv(options, (err, data) => {
+    createReadStream(path)
+    .pipe(csv(options, (err, data) => {
       if (err) rejectWithError(err);
       else resolve(data.map((e: any) => parseEntry(user, e)));
-    }));
+    }))
+    .on("error", rejectWithError);
   });
 }
 
