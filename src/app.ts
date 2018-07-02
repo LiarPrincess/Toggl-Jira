@@ -1,22 +1,17 @@
 import { join } from "path";
-import * as toggl from "./toggl";
-import * as jira from "./jira";
 import logger from "./util/logger";
 import { User } from "./users";
 import { prettyTogglEntry, prettyJiraEntry, prettyWorkEntry } from "./util/pretty-print";
+import * as toggl from "./toggl";
+import * as jira from "./jira";
 
 import "moment-duration-format";
 import "./util/configuration";
 
+const user = require("./../user.json") as User;
+
 (async () => {
   try {
-    const user: User = {
-      togglToken:   process.env.TOGGL_TOKEN as string,
-      jiraUsername: process.env.JIRA_USERNAME as string,
-      jiraPassword: process.env.JIRA_PASSWORD as string,
-      timezone:     process.env.TIMEZONE as string,
-    };
-
     const exportPath = join(process.cwd(), "private", "input.csv");
     const exportEntries = await toggl.parseExport(user, exportPath);
 
