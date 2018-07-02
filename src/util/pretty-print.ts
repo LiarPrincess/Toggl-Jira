@@ -1,28 +1,32 @@
+import { Moment, Duration } from "moment";
+
 import { JiraEntry, WorkEntry } from "src/jira";
 import { TogglEntry } from "src/toggl";
 
-export function prettyWorkEntry(entry: WorkEntry): string {
-  const ticket = entry.ticket;
-  const date = entry.date.format("YYYY-MM-DD HH:mm:ss Z");
-  const duration = entry.duration.format("HH[h] mm[m] ss[s]");
-  return `${date} ${ticket} ${duration}`;
+export function moment(date: Moment): string {
+  return date.format("YYYY-MM-DD HH:mm:ss Z");
 }
 
-export function prettyJiraEntry(entry: JiraEntry): string {
-  const ticket = entry.ticket;
-  const date = entry.date.format("YYYY-MM-DD");
-  return `${date} ${ticket}`;
+export function momentAsDate(date: Moment) {
+  return date.format("YYYY-MM-DD");
 }
 
-export function prettyTogglEntry(entry: TogglEntry): string {
-  const id = entry.id;
-  const date = entry.date.format("YYYY-MM-DD HH:mm:ss Z");
-  const duration = entry.duration.format("HH[h] mm[m] ss[s]");
+export function duration(duration: Duration) {
+  return duration.format({
+    template: "HH[h] mm[m] ss[s]",
+    trim: false,
+  });
+}
 
-  const maxDescriptionLength = 60;
-  const description = entry.description.length > maxDescriptionLength ?
-    entry.description.substr(0, maxDescriptionLength - 3) + "..." :
-    entry.description;
+export function workEntry(entry: WorkEntry): string {
+  return `${moment(entry.date)} ${entry.ticket} ${duration(entry.duration)}`;
+}
 
-  return `${id} | ${date} | ${duration} | ${description}`;
+export function jiraEntry(entry: JiraEntry): string {
+  const url = `${process.env.JIRA_PROTOCOL}://${process.env.JIRA_HOST}/browse/${entry.ticket}`;
+  return `${momentAsDate(entry.date)} ${duration(entry.duration)} ${entry.ticket} (${url})`;
+}
+
+export function togglEntry(entry: TogglEntry): string {
+  return `${moment(entry.date)} | ${duration(entry.duration)} | ${entry.description}`;
 }
