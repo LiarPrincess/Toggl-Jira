@@ -3,7 +3,6 @@ import logger from "./logger";
 
 const CONFIGURATION_FILE = ".env";
 
-logger.debug(`Using ${CONFIGURATION_FILE} file to supply config environment variables`);
 const result = config({ path: CONFIGURATION_FILE });
 
 if (result.error) {

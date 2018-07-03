@@ -25,7 +25,7 @@ const user = require("./../user.json") as User;
     // const endDate   = date("2018-06-20", user.timezone);
     const endDate = date(user.timezone).endOf("day");
     const startDate = endDate.clone().subtract(2, "day").startOf("day");
-    logger.info(`Syncing entries from '${pretty.momentAsDate(startDate)}' to '${pretty.momentAsDate(endDate)}'`);
+    logger.info(`Syncing entries from '${pretty.momentDate(startDate)}' to '${pretty.momentDate(endDate)}'`);
 
     const entries = await toggl.getEntries(user, startDate, endDate);
     logger.info(`Found ${entries.length} entries to sync`);
