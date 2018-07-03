@@ -1,6 +1,6 @@
-import User from "src/user";
+import User from "user";
 import { JiraEntry } from ".";
-import { TogglEntry } from "src/toggl";
+import { TogglEntry } from "toggl";
 import { equalTicketAndDay } from "./time-zone";
 
 interface MappingResult {

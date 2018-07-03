@@ -1,5 +1,5 @@
-import User from "src/user";
-import { TogglEntry } from "src/toggl";
+import User from "user";
+import { TogglEntry } from "toggl";
 import { default as map } from "./mapper";
 import { addWorkLog, getWorkLog } from "./api";
 import { JiraEntry, WorkEntry, SyncResult } from ".";

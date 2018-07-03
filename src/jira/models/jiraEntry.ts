@@ -1,5 +1,5 @@
 import { Moment, Duration } from "moment";
-import { TogglEntry } from "./../../toggl";
+import { TogglEntry } from "toggl";
 
 export default interface JiraEntry {
   readonly ticket: string;

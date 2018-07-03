@@ -1,6 +1,6 @@
 export default interface User {
-  togglToken: string;
-  jiraUsername: string;
-  jiraPassword: string;
-  timezone: string;
+  readonly togglToken: string;
+  readonly jiraUsername: string;
+  readonly jiraPassword: string;
+  readonly timezone: string;
 }

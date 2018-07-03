@@ -2,7 +2,7 @@ import { duration, default as moment, ISO_8601 } from "moment-timezone";
 import { default as csv } from "csv-parse";
 import { createReadStream } from "fs";
 
-import User from "src/user";
+import User from "user";
 import { TogglEntry } from ".";
 
 export function parseExport(user: User, path: string): Promise<TogglEntry[]> {

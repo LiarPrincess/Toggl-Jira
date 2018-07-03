@@ -17,8 +17,8 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Module Resolution Options */
+    "baseUrl": "./src",
     "moduleResolution": "node",
-    "baseUrl": ".",
     "esModuleInterop": true,
   },
   "include": [
