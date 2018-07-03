@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     /* Basic Options */
-    "target": "es6",
+    "target": "es2015",
     "module": "commonjs",
     "lib": ["es2015"],
 
     "outDir": "./dist",
     "rootDir": "./src",
 
-    "sourceMap": true,
+    "inlineSourceMap": true,
     "removeComments": true,
 
     /* Strict Type-Checking Options */
@@ -19,14 +19,12 @@
     /* Module Resolution Options */
     "moduleResolution": "node",
     "baseUrl": ".",
-    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
   },
   "include": [
-      "src/**/*.ts"
+    "src/**/*.ts",
   ],
   "exclude": [
-      "node_modules",
-      "**/*.spec.ts"
+    "node_modules",
   ]
 }
