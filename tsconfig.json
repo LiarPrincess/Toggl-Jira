@@ -9,7 +9,6 @@
     "rootDir": "./src",
 
     "inlineSourceMap": true,
-    "removeComments": true,
 
     /* Strict Type-Checking Options */
     "strict": true,

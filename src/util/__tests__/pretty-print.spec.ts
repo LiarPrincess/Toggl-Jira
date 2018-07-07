@@ -1,8 +1,8 @@
 import * as moment from "moment-timezone";
 
 import * as pretty from "./../pretty-print";
-import { TogglEntry } from "../../toggl";
-import { JiraEntry, WorkEntry } from "../../jira";
+import { TogglEntry } from "toggl";
+import { JiraEntry, WorkEntry } from "jira";
 
 process.env.JIRA_PROTOCOL = "https";
 process.env.JIRA_HOST = "jira.company.com";

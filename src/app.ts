@@ -1,7 +1,7 @@
 import { tz as date } from "moment-timezone";
 
 import logger from "./util/logger";
-import User from "./user";
+import { default as User, TogglUser, JiraUser } from "./user";
 import * as pretty from "./util/pretty-print";
 import * as toggl from "./toggl";
 import * as jira from "./jira";
@@ -10,15 +10,17 @@ import "moment-duration-format";
 import "./util/configuration";
 
 const user = require("./../user.json") as User;
+const togglUser = { apiToken: user.togglToken, timezone: user.timezone };
+const jiraUser = { username: user.jiraUsername, password: user.jiraPassword, timezone: user.timezone };
 
 (async () => {
   try {
     logger.info("Start");
 
-    const currentEntry = await toggl.getCurrentEntry(user);
+    const currentEntry = await toggl.getCurrentEntry(togglUser);
     if (currentEntry) {
       logger.info(`Stopping Toggl entry: '${currentEntry.description}'`);
-      await toggl.stopEntry(user, currentEntry);
+      await toggl.stopEntry(togglUser, currentEntry);
     }
 
     // const startDate = date("2018-06-01", user.timezone);
@@ -27,7 +29,7 @@ const user = require("./../user.json") as User;
     const startDate = endDate.clone().subtract(2, "day").startOf("day");
     logger.info(`Syncing entries from '${pretty.momentDate(startDate)}' to '${pretty.momentDate(endDate)}'`);
 
-    const entries = await toggl.getEntries(user, startDate, endDate);
+    const entries = await toggl.getEntries(togglUser, startDate, endDate);
     logger.info(`Found ${entries.length} entries to sync`);
 
     const result = await jira.sync(user, entries);

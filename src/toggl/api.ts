@@ -1,10 +1,10 @@
 import { Moment, duration, utc, ISO_8601 } from "moment";
 import { get, post, put } from "request-promise-native";
 
-import User from "user";
+import { TogglUser } from "user";
 import { TogglEntry } from ".";
 
-export function startEntry(user: User, description: string): Promise<TogglEntry> {
+export function startEntry(user: TogglUser, description: string): Promise<TogglEntry> {
   const request = createRequest(user, "time_entries/start");
   request.body = {
     "time_entry": { "description": description, "created_with": "api" }
@@ -15,21 +15,21 @@ export function startEntry(user: User, description: string): Promise<TogglEntry>
     .catch((err) => throwError(`Unable to start new Toggl entry ${description}: ${err.message}.`));
 }
 
-export function stopEntry(user: User, entry: TogglEntry): Promise<TogglEntry> {
+export function stopEntry(user: TogglUser, entry: TogglEntry): Promise<TogglEntry> {
   const request = createRequest(user, `time_entries/${entry.id}/stop`);
   return put(request)
     .then((json) => parseEntry(json.data))
     .catch((err) => throwError(`Unable to stop Toggl entry '${entry.description}': ${err.message}.`));
 }
 
-export function getCurrentEntry(user: User): Promise<TogglEntry | undefined> {
+export function getCurrentEntry(user: TogglUser): Promise<TogglEntry | null> {
   const request = createRequest(user, "time_entries/current");
   return get(request)
-    .then((json) => json.data ? parseEntry(json.data) : undefined)
+    .then((json) => json.data ? parseEntry(json.data) : null)
     .catch((err) => throwError(`Unable to get current Toggl entry: ${err.message}.`));
 }
 
-export function getEntries(user: User, startDate: Moment, endDate: Moment): Promise<TogglEntry[]> {
+export function getEntries(user: TogglUser, startDate: Moment, endDate: Moment): Promise<TogglEntry[]> {
   const request = createRequest(user, "time_entries");
   request.qs = {
     start_date: startDate.toISOString(),
@@ -41,12 +41,12 @@ export function getEntries(user: User, startDate: Moment, endDate: Moment): Prom
     .catch((err) => throwError(`Unable to get Toggl entries: ${err.message}.`));
 }
 
-function createRequest(user: User, endpoint: string): any {
+function createRequest(user: TogglUser, endpoint: string): any {
   return {
     url: endpoint,
     baseUrl: process.env.TOGGL_BASE_URL,
     auth: {
-      user: user.togglToken,
+      user: user.apiToken,
       pass: "api_token",
     },
     json: true,

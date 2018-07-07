@@ -18,20 +18,13 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Jest Tests",
+      "name": "Debug Jest with current test file",
       "program": "${workspaceRoot}/node_modules/jest/bin/jest.js",
-      "args": [
-          "--config",
-          "package.json",
-          "--runInBand"
-      ],
-      "runtimeArgs": [
-          "--nolazy"
-      ],
+      "args": ["--runInBand", "${file}"],
       "console": "internalConsole",
       "env": {
-          "NODE_ENV": "test"
+        "NODE_ENV": "test"
       }
-    }
+    },
   ]
 }
