@@ -42,7 +42,7 @@ describe("stopEntry", () => {
   it("stops entry from toggl example", async () => {
     nock(baseUrl)
       .put(endpoint)
-      .delayBody(500)
+      .delayBody(50)
       .replyWithFile(200, fixture("stop.example.json"), { "Content-Type": "application/json" });
 
       const updatedEntry = await toggl.stopEntry(user, entry);
@@ -58,7 +58,7 @@ describe("stopEntry", () => {
     const message = "Something awful happened";
     nock(baseUrl)
       .put(endpoint)
-      .delayBody(500)
+      .delayBody(50)
       .replyWithError(message);
 
     try {
@@ -76,7 +76,7 @@ describe("getCurrentEntry", () => {
   it("parses response without entry", async () => {
     nock(baseUrl)
       .get(endpoint)
-      .delayBody(500)
+      .delayBody(50)
       .replyWithFile(200, fixture("current.empty.json"), { "Content-Type": "application/json" });
 
     const entry = await toggl.getCurrentEntry(user);
@@ -86,7 +86,7 @@ describe("getCurrentEntry", () => {
   it("parses response from toggl example", async () => {
     nock(baseUrl)
       .get(endpoint)
-      .delayBody(500)
+      .delayBody(50)
       .replyWithFile(200, fixture("current.example.json"), { "Content-Type": "application/json" });
 
     const entry = await toggl.getCurrentEntry(user);
@@ -102,7 +102,7 @@ describe("getCurrentEntry", () => {
     const message = "Something awful happened";
     nock(baseUrl)
     .get(endpoint)
-      .delayBody(500)
+      .delayBody(50)
       .replyWithError(message);
 
     try {
@@ -122,7 +122,7 @@ describe("getEntries", () => {
   it("parses response without entries", async () => {
     nock(baseUrl)
     .get(endpoint)
-      .delayBody(500)
+      .delayBody(50)
       .replyWithFile(200, fixture("time_entries.empty.json"), { "Content-Type": "application/json" });
 
     const entries = await toggl.getEntries(user, startDate, endDate);
@@ -132,7 +132,7 @@ describe("getEntries", () => {
   it("parses response from toggl example", async () => {
     nock(baseUrl)
     .get(endpoint)
-      .delayBody(500)
+      .delayBody(50)
       .replyWithFile(200, fixture("time_entries.example.json"), { "Content-Type": "application/json" });
 
     const entries = await toggl.getEntries(user, startDate, endDate);
@@ -156,7 +156,7 @@ describe("getEntries", () => {
     const message = "Something awful happened";
     nock(baseUrl)
     .get(endpoint)
-      .delayBody(500)
+      .delayBody(50)
       .replyWithError(message);
 
     try {
