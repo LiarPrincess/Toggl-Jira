@@ -1,9 +1,9 @@
 import { default as nock } from "nock";
 import * as moment from "moment-timezone";
 
-import * as api from "./..";
+import * as toggl from "./..";
 import { TogglUser } from "user";
-import TogglEntry from "../models/togglEntry";
+import { TogglEntry } from "./..";
 
 const baseUrl = "https://www.toggl.com/api/v8";
 process.env.TOGGL_BASE_URL = baseUrl;
@@ -45,7 +45,7 @@ describe("stopEntry", () => {
       .delayBody(500)
       .replyWithFile(200, fixture("stop.example.json"), { "Content-Type": "application/json" });
 
-      const updatedEntry = await api.stopEntry(user, entry);
+      const updatedEntry = await toggl.stopEntry(user, entry);
       expect(updatedEntry).toEqual({
         id: 436694100,
         description: "Meeting with possible clients",
@@ -62,7 +62,7 @@ describe("stopEntry", () => {
       .replyWithError(message);
 
     try {
-      await api.stopEntry(user, entry);
+      await toggl.stopEntry(user, entry);
       expect(false).toBe(true);
     } catch (error) {
       expect(error.message.includes(message)).toBe(true);
@@ -79,7 +79,7 @@ describe("getCurrentEntry", () => {
       .delayBody(500)
       .replyWithFile(200, fixture("current.empty.json"), { "Content-Type": "application/json" });
 
-    const entry = await api.getCurrentEntry(user);
+    const entry = await toggl.getCurrentEntry(user);
     expect(entry).toBeNull();
   });
 
@@ -89,7 +89,7 @@ describe("getCurrentEntry", () => {
       .delayBody(500)
       .replyWithFile(200, fixture("current.example.json"), { "Content-Type": "application/json" });
 
-    const entry = await api.getCurrentEntry(user);
+    const entry = await toggl.getCurrentEntry(user);
     expect(entry).toEqual({
       id: 436694100,
       description: "Running time entry",
@@ -106,7 +106,7 @@ describe("getCurrentEntry", () => {
       .replyWithError(message);
 
     try {
-      await api.getCurrentEntry(user);
+      await toggl.getCurrentEntry(user);
       expect(false).toBe(true);
     } catch (error) {
       expect(error.message.includes(message)).toBe(true);
@@ -125,7 +125,7 @@ describe("getEntries", () => {
       .delayBody(500)
       .replyWithFile(200, fixture("time_entries.empty.json"), { "Content-Type": "application/json" });
 
-    const entries = await api.getEntries(user, startDate, endDate);
+    const entries = await toggl.getEntries(user, startDate, endDate);
     expect(entries).toEqual([]);
   });
 
@@ -135,7 +135,7 @@ describe("getEntries", () => {
       .delayBody(500)
       .replyWithFile(200, fixture("time_entries.example.json"), { "Content-Type": "application/json" });
 
-    const entries = await api.getEntries(user, startDate, endDate);
+    const entries = await toggl.getEntries(user, startDate, endDate);
     expect(entries).toEqual([
       {
         id: 436691234,
@@ -160,7 +160,7 @@ describe("getEntries", () => {
       .replyWithError(message);
 
     try {
-      await api.getEntries(user, startDate, endDate);
+      await toggl.getEntries(user, startDate, endDate);
       expect(false).toBe(true);
     } catch (error) {
       expect(error.message.includes(message)).toBe(true);

@@ -2,10 +2,10 @@ import { duration, default as moment, ISO_8601 } from "moment-timezone";
 import { default as csv } from "csv-parse";
 import { createReadStream } from "fs";
 
-import User from "user";
+import { TogglUser } from "user";
 import { TogglEntry } from ".";
 
-export function parseExport(user: User, path: string): Promise<TogglEntry[]> {
+export function parseExport(user: TogglUser, path: string): Promise<TogglEntry[]> {
   return new Promise((resolve, reject) => {
     const options = { columns: true, delimiter: "," };
 
@@ -22,7 +22,7 @@ export function parseExport(user: User, path: string): Promise<TogglEntry[]> {
   });
 }
 
-function parseEntry(user: User, entry: any): TogglEntry {
+function parseEntry(user: TogglUser, entry: any): TogglEntry {
   const timezone = user.timezone;
   const dateString = `${entry["Start date"]}T${entry["Start time"]}`;
 
