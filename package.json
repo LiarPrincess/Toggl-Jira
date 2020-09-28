@@ -2,7 +2,7 @@
   "name": "toggl-jira",
   "version": "1.0.0",
   "description": "Sync Toggl time entries to JIRA.",
-  "author": "Michal M.",
+  "author": "",
   "license": "ISC",
   "scripts": {
     "start": "node dist/app.js",

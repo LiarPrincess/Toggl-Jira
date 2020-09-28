@@ -1,9 +1,5 @@
-.env
-user.json
-
 dist
 node_modules
-private
 logs
 
 # OS metadata
