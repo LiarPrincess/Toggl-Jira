@@ -8,7 +8,7 @@ interface MappingResult {
   readonly unmappedEntries: TogglEntry[];
 }
 
-export default function map(user: User, togglEntries: TogglEntry[]): MappingResult {
+export default function toJiraEntries(user: User, togglEntries: TogglEntry[]): MappingResult {
   const ticketRegex = new RegExp(`(${process.env.JIRA_TICKET_REGEX})`);
 
   const result: MappingResult = { entries: [], unmappedEntries: [] };

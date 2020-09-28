@@ -1,12 +1,12 @@
 import User from "user";
 import { TogglEntry } from "toggl";
-import { default as map } from "./mapper";
+import { default as toJiraEntries } from "./mapper";
 import { addWorkLog, getWorkLog } from "./api";
 import { JiraEntry, WorkEntry, SyncResult } from ".";
 import { equalTicketAndDay, inUserTimeZone } from "./time-zone";
 
 export async function sync(user: User, togglEntries: TogglEntry[]): Promise<SyncResult> {
-  const { entries, unmappedEntries } = map(user, togglEntries);
+  const { entries: jiraEntries, unmappedEntries } = toJiraEntries(user, togglEntries);
 
   const result: SyncResult = {
     entries: [],
@@ -15,17 +15,17 @@ export async function sync(user: User, togglEntries: TogglEntry[]): Promise<Sync
     failedEntries: []
   };
 
-  const existingWorklogs = await getWorklogs(user, entries);
-  for (const entry of entries) {
-    const entryResult = await syncEntry(user, entry, existingWorklogs);
+  const existingWorklogs = await getWorklogs(user, jiraEntries);
+  for (const jiraEntry of jiraEntries) {
+    const entryResult = await syncEntry(user, jiraEntry, existingWorklogs);
     if (entryResult == "Duplicate") {
-      result.duplicateEntries.push(entry);
+      result.duplicateEntries.push(jiraEntry);
     }
     else if (entryResult instanceof Error) {
-      result.failedEntries.push( { ...entry, error: entryResult });
+      result.failedEntries.push( { ...jiraEntry, error: entryResult });
     }
     else {
-      result.entries.push(entry);
+      result.entries.push(jiraEntry);
     }
   }
   return Promise.resolve(result);
